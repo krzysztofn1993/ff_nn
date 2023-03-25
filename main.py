@@ -4,17 +4,6 @@ from nnfs.datasets import spiral_data
 
 nnfs.init()
 
-
-X = [[1, 2, 3, 2.5],
-    [2.0, 5.0, -1.0, 2.0],
-    [-1.5, 2.7, 3.3, -0.8]]
-
-X, y = spiral_data(100, 3)
-
-inputs = [ 0, 2, -1, 3.3, -2.7, 1.1, 2.2, -100]
-output = []
-
-
 class Layer:
     def __init__(self,n_inputs, n_neurons) -> None:
         self.weights = np.random.randn(n_inputs, n_neurons) * 0.10
@@ -30,11 +19,25 @@ class ReLU:
         self.output = np.maximum(0, inputs)
 
 
-layer1 = Layer(2, 5)
+class Softmax:
+    def forward(self, inputs):
+        exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+        probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
+
+        self.output = probabilities
+
+X, y = spiral_data(samples=100, classes=3)
+# print(X)
+layer1 = Layer(2,3)
 activation1 = ReLU()
 
+layer2 = Layer(3,3)
+activation2 = Softmax()
+
 layer1.forward(X)
-
-
 activation1.forward(layer1.output)
-print(activation1.output)
+
+layer2.forward(activation1.output)
+activation2.forward(layer2.output)
+
+print(activation2.output[:5])
